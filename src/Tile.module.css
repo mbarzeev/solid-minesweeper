@@ -1,0 +1,17 @@
+.Tile {
+    width: var(--tile-dimension);
+    height: var(--tile-dimension);
+    border: 1px solid white;
+    cursor: pointer;
+}
+
+.value {
+    display: none;
+    font-weight: bolder;
+    user-select: none;
+    line-height: var(--tile-dimension);
+}
+
+.value.exposed {
+    display: block;
+}
