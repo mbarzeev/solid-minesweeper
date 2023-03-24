@@ -10,8 +10,11 @@
     font-weight: bolder;
     user-select: none;
     line-height: var(--tile-dimension);
+    width: 100%;
+    height: 100%;
 }
 
 .value.exposed {
     display: block;
+    background-color: grey;
 }

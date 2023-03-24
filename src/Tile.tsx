@@ -1,30 +1,37 @@
 import {Component, createSignal} from 'solid-js';
 import styles from './Tile.module.css';
 
+export type TileValue = number | 'x';
 export type TileData = {
-    isMine: boolean;
-    value?: number;
+    index: number;
+    value: TileValue;
+    isOpen: boolean;
+    isMarked: boolean;
+};
+export type TileProps = {
+    data: TileData;
+    onTileContextMenu: (index: number) => void;
+    onTileClicked: (index: number) => void;
 };
 
-const Tile: Component<TileData> = (data: TileData) => {
-    const [isOpen, setIsOpen] = createSignal(false);
-    const [isMarked, setIsMarked] = createSignal(false);
-
-    const onTileClicked = (event: MouseEvent) => {
-        !isMarked() && setIsOpen(true);
-    };
-
+const Tile: Component<TileProps> = ({data, onTileContextMenu, onTileClicked}) => {
     const onTileContextClick = (event: MouseEvent) => {
         event.preventDefault();
-        !isOpen() && setIsMarked(!isMarked());
+        onTileContextMenu(data.index);
     };
 
-    const value = data.isMine ? 'X' : data.value;
+    const value = data.value === 'x' ? 'X' : data.value;
 
     return (
-        <div class={styles.Tile} onclick={onTileClicked} onContextMenu={onTileContextClick}>
-            <div class={styles.value} classList={{[styles.exposed]: isOpen() || isMarked()}}>
-                {isMarked() ? '🚩' : value !== 0 ? value : ''}
+        <div
+            class={styles.Tile}
+            onclick={() => {
+                onTileClicked(data.index);
+            }}
+            onContextMenu={onTileContextClick}
+        >
+            <div class={styles.value} classList={{[styles.exposed]: data.isOpen || data.isMarked}}>
+                {data.isMarked ? '🚩' : value !== 0 ? value : ''}
             </div>
         </div>
     );
