@@ -1,4 +1,5 @@
 import {Component, createSignal} from 'solid-js';
+import {MINE_VALUE} from './App';
 import styles from './Tile.module.css';
 
 export type TileValue = number | 'x';
@@ -7,6 +8,7 @@ export type TileData = {
     value: TileValue;
     isOpen: boolean;
     isMarked: boolean;
+    isDetonated: boolean;
 };
 export type TileProps = {
     data: TileData;
@@ -20,7 +22,7 @@ const Tile: Component<TileProps> = ({data, onTileContextMenu, onTileClicked}) =>
         onTileContextMenu(data.index);
     };
 
-    const value = data.value === 'x' ? 'X' : data.value;
+    const value = data.value === MINE_VALUE ? '💣' : data.value;
 
     return (
         <div
@@ -30,7 +32,10 @@ const Tile: Component<TileProps> = ({data, onTileContextMenu, onTileClicked}) =>
             }}
             onContextMenu={onTileContextClick}
         >
-            <div class={styles.value} classList={{[styles.exposed]: data.isOpen || data.isMarked}}>
+            <div
+                class={styles.value}
+                classList={{[styles.exposed]: data.isOpen || data.isMarked, [styles.detonated]: data.isDetonated}}
+            >
                 {data.isMarked ? '🚩' : value !== 0 ? value : ''}
             </div>
         </div>

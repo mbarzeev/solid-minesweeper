@@ -1,8 +1,8 @@
 .Tile {
     width: var(--tile-dimension);
     height: var(--tile-dimension);
-    border: 1px solid white;
     cursor: pointer;
+    outline: 1px white solid;
 }
 
 .value {
@@ -12,9 +12,15 @@
     line-height: var(--tile-dimension);
     width: 100%;
     height: 100%;
+    font-size: large;
 }
 
 .value.exposed {
     display: block;
     background-color: grey;
+}
+
+.value.detonated {
+    display: block;
+    background-color: red;
 }
