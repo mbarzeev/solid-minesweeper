@@ -40,3 +40,19 @@
   width: 50px;
   font-size: 25px;
 }
+
+.copyrights {
+  display: flex;
+  justify-content: center;
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+.copyrights p {
+  display: block;
+
+}
+
+.copyrights a {
+  color: aqua;
+}

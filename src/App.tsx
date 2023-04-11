@@ -176,6 +176,12 @@ const App: Component = () => {
                         )}
                     </For>
                 </div>
+                <span class={styles.copyrights}>
+                    <a href="https://twitter.com/mattibarzeev" target="_blank" rel="noopener noreferrer">
+                        Matti Bar-Zeev
+                    </a>
+                    , 2023
+                </span>
             </header>
             {gameState() !== GAME_STATUS.ONGOING && <Backdrop />}
             {gameState() !== GAME_STATUS.ONGOING && (
