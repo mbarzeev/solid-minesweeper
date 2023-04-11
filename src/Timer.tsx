@@ -1,7 +1,11 @@
-import {Accessor} from 'solid-js';
+import {Accessor, ComponentProps} from 'solid-js';
 
-const Timer = ({seconds}: {seconds: Accessor<number>}) => {
-    return <div>{getDisplayTimeBySeconds(seconds())}</div>;
+interface TimerProps extends ComponentProps<'div'> {
+    seconds: Accessor<number>;
+}
+
+const Timer = ({seconds, ...props}: TimerProps) => {
+    return <div {...props}>{getDisplayTimeBySeconds(seconds())}</div>;
 };
 
 const getDisplayTimeBySeconds = (seconds: number) => {

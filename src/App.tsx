@@ -1,6 +1,8 @@
 import {Component, createEffect, createSignal, For} from 'solid-js';
 
 import styles from './App.module.css';
+import Backdrop from './Backdrop/Backdrop';
+import GameOverModal from './GameOverModal/GameOverModal';
 import Tile, {TileData, TileValue} from './Tile';
 import Timer from './Timer';
 
@@ -9,39 +11,29 @@ const [remainingMines, setRemainingMines] = createSignal<number>(TOTAL_MINES);
 const ROW_LENGTH = 20;
 export const MINE_VALUE = 'x';
 const TOTAL_TILES = Math.pow(ROW_LENGTH, 2);
-const boardArray = [...Array(TOTAL_TILES)].fill(0);
-let isGameOver = false;
 
-let count = 0;
-while (count < TOTAL_MINES) {
-    const randomCellIndex = Math.floor(Math.random() * TOTAL_TILES);
-    if (boardArray[randomCellIndex] !== 1) {
-        boardArray[randomCellIndex] = 1;
-        count++;
-    }
-}
-
-// Convert the boardArray to TilesArray
-const [tilesArray, setTilesArray] = createSignal<TileData[]>(
-    boardArray.map((item, index) => ({
-        index,
-        value: getTileValue(index),
-        isOpen: false,
-        isMarked: false,
-        isDetonated: false,
-    }))
-);
+const [tilesArray, setTilesArray] = createSignal<TileData[]>([]);
 
 let timerInterval: number;
-const [timerSeconds, setTimerSeconds] = createSignal(0);
+export const [timerSeconds, setTimerSeconds] = createSignal(0);
 const startTimer = () => {
+    clearInterval(timerInterval);
+    setTimerSeconds(0);
     timerInterval = setInterval(() => {
         setTimerSeconds(timerSeconds() + 1);
     }, 1000);
 };
 
+export enum GAME_STATUS {
+    WON = 'won',
+    LOST = 'lost',
+    ONGOING = 'ongoing',
+}
+
+export const [gameState, setGameState] = createSignal<GAME_STATUS>(GAME_STATUS.ONGOING);
+
 createEffect(() => {
-    if (isGameOver) return;
+    if (gameState() !== GAME_STATUS.ONGOING) return;
     const markedTiles = tilesArray().filter((tile) => tile.isMarked);
     setRemainingMines(TOTAL_MINES - markedTiles.length);
 
@@ -90,7 +82,7 @@ const onTileClicked = (index: number) => {
 };
 
 const gameWon = () => {
-    isGameOver = true;
+    setGameState(GAME_STATUS.WON);
     clearInterval(timerInterval);
     setTilesArray((prevArray) => {
         const newArray = prevArray.map((tile) => {
@@ -102,7 +94,7 @@ const gameWon = () => {
 };
 
 const gameOver = () => {
-    isGameOver = true;
+    setGameState(GAME_STATUS.LOST);
     clearInterval(timerInterval);
     setTilesArray((prevArray) => {
         const newArray = prevArray.map((tile) => {
@@ -127,15 +119,55 @@ const openTiles = (indices: number[]) => {
     });
 };
 
-startTimer();
+const restartGame = () => {
+    // Hide all the tiles
+    setTilesArray((prevArray) => {
+        const newArray = prevArray.map((tile) => {
+            return {...tile, isOpen: false, isDetonated: false, isMarked: false};
+        });
+
+        return newArray;
+    });
+    startTimer();
+    setGameState(GAME_STATUS.ONGOING);
+};
+
+const startNewGame = () => {
+    let count = 0;
+    const boardArray = [...Array(TOTAL_TILES)].fill(0);
+    while (count < TOTAL_MINES) {
+        const randomCellIndex = Math.floor(Math.random() * TOTAL_TILES);
+        if (boardArray[randomCellIndex] !== 1) {
+            boardArray[randomCellIndex] = 1;
+            count++;
+        }
+    }
+
+    setTilesArray(
+        boardArray.map((item, index, array) => ({
+            index,
+            value: getTileValue(index, array),
+            isOpen: false,
+            isMarked: false,
+            isDetonated: false,
+        }))
+    );
+    startTimer();
+    setGameState(GAME_STATUS.ONGOING);
+};
+
+startNewGame();
 
 const App: Component = () => {
     return (
         <div class={styles.App} style={{'--row-length': ROW_LENGTH}}>
             <header class={styles.header}>
                 <div class={styles.gamePanel}>
-                    <span>{remainingMines()}</span>
-                    <Timer seconds={timerSeconds} />
+                    <span style={{width: '100px', 'text-align': 'left'}}>{remainingMines()}</span>
+                    <button class={styles.resetBtn} onclick={startNewGame}>
+                        {gameState() === GAME_STATUS.LOST ? '🙁' : '🙂'}
+                    </button>
+                    <Timer seconds={timerSeconds} style={{width: '100px', 'text-align': 'right'}} />
                 </div>
                 <div class={styles.board}>
                     <For each={tilesArray()}>
@@ -145,6 +177,10 @@ const App: Component = () => {
                     </For>
                 </div>
             </header>
+            {gameState() !== GAME_STATUS.ONGOING && <Backdrop />}
+            {gameState() !== GAME_STATUS.ONGOING && (
+                <GameOverModal onPlayAgain={restartGame} onNewGame={startNewGame} />
+            )}
         </div>
     );
 };
@@ -189,7 +225,7 @@ function getTotalZeroTilesIndices(index: number): number[] {
     return indices;
 }
 
-function getTileValue(index: number): TileValue {
+function getTileValue(index: number, boardArray: number[]): TileValue {
     const cell = boardArray[index];
     if (cell === 1) {
         return MINE_VALUE;

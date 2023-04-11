@@ -1,0 +1,44 @@
+.GameOverModal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    box-sizing: border-box;
+    background: #fff;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    width: 100%;
+    max-width: 400px;
+    height: fit-content;
+    max-height: 100%;
+    box-shadow: 0 5px 10px 2px rgba(195, 192, 192, 0.5);
+    padding: 20px;
+    text-align: center;
+    border-radius: 6px;
+}
+
+.time {
+    display: flex;
+}
+
+.actionPanel {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.actionBtn {
+    border-radius: 24px;
+    width: fit-content;
+    padding: 6px 34px;
+    margin: 20px;
+    background-color: aqua;
+    border: none;
+    cursor: pointer;
+    font-weight: bolder;
+}

@@ -33,3 +33,10 @@
   box-sizing: content-box;
   padding: 0 var(--scoring-padding);
 }
+
+.resetBtn {
+  background: transparent;
+  height: 80%;
+  width: 50px;
+  font-size: larger;
+}
